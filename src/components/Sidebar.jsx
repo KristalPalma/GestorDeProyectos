@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 
-//iconos
-import { RiHome3Line } from "react-icons/ri";
-import { GrDocumentText } from "react-icons/gr";
-import { FaPerson } from "react-icons/fa6";
 import { IoMenu } from "react-icons/io5";
 import { IoIosClose } from "react-icons/io";
+
+import { Grid2x2, Users, StickyNote , LayoutDashboard } from 'lucide-react';
 
 const Sidebar = () => {
     const [showMenu, setShowMenu] = useState(false);
@@ -29,13 +27,16 @@ const Sidebar = () => {
 
                         {/* Pages */}
                         <a href="#" className="flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-Brown-third transition-colors">
-                            <RiHome3Line /> Inicio
+                        <LayoutDashboard /> Inicio
                         </a>
                         <a href="#" className="flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-Brown-third transition-colors">
-                            <FaPerson /> Clientes
+                        <StickyNote /> Proyectos
                         </a>
                         <a href="#" className="flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-Brown-third transition-colors">
-                            <GrDocumentText /> Tratamientos
+                        <Users /> Equipos
+                        </a>
+                        <a href="#" className="flex items-center gap-4 text-white py-2 px-4 rounded-xl hover:bg-Brown-third transition-colors">
+                        <Grid2x2 /> Inventario
                         </a>
                     </nav>
                 </div>
