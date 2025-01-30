@@ -1,11 +1,11 @@
-import React from "react";
+
 // Icons
 import { Search } from 'lucide-react';
 const Header = () => {
   return (
     <header className="flex flex-col md:flex-row items-center justify-between gap-4">
-      <h1 className="text-2xl md:text-3xl font-bold">
-        Bienvenida <span className="text-primary-100">Kris</span>
+      <h1 className="text-2xl md:text-4xl font-bold bg-background rounded-full ">
+        Dashboard <span className="text-primary-100"> kris </span>
       </h1>
       <form className="w-full md:w-auto">
         <div className="relative">

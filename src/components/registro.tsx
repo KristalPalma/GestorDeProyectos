@@ -1,12 +1,15 @@
-'use client'
+"use client"
 
-import { useState } from 'react'
+import React from "react"
+import { useState } from "react"
 
 interface FormData {
   usuario: string
   email: string
   password: string
   telefono: string
+  securityQuestion: string
+  securityAnswer: string
 }
 
 interface RegistroProps {
@@ -14,50 +17,66 @@ interface RegistroProps {
   setUser: (user: any) => void
 }
 
+const SECURITY_QUESTIONS = [
+  "¿Cuál es el nombre de tu primera mascota?",
+  "¿En qué ciudad naciste?",
+  "¿Cuál es el nombre de tu mejor amigo de la infancia?",
+  "¿Cuál fue tu primer auto?",
+]
+
 export default function Registro({ onLoginClick, setUser }: RegistroProps) {
   const [isLoading, setIsLoading] = useState(false)
-  const [error, setError] = useState('')
+  const [error, setError] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [formData, setFormData] = useState<FormData>({
-    usuario: '',
-    email: '',
-    password: '',
-    telefono: ''
+    usuario: "",
+    email: "",
+    password: "",
+    telefono: "",
+    securityQuestion: SECURITY_QUESTIONS[0],
+    securityAnswer: "",
   })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
-    setError('')
+    setError("")
 
     try {
-      // Simulación de llamada API
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      console.log('Datos del formulario:', formData)
-      
+      const res = await fetch("/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: formData.usuario,
+          email: formData.email,
+          password: formData.password,
+          securityQuestion: formData.securityQuestion,
+          securityAnswer: formData.securityAnswer,
+        }),
+      })
+
+      const data = await res.json()
+
+      if (!res.ok) {
+        throw new Error(data.error)
+      }
+
       // Set user after successful registration
       setUser([formData.usuario])
-      
-      // Resetear el formulario después del éxito
-      setFormData({
-        usuario: '',
-        email: '',
-        password: '',
-        telefono: ''
-      })
-      
-    } catch (err) {
-      setError('Ocurrió un error durante el registro')
+    } catch (err: any) {
+      setError(err.message || "Ocurrió un error durante el registro")
     } finally {
       setIsLoading(false)
     }
   }
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }))
   }
 
@@ -68,9 +87,7 @@ export default function Registro({ onLoginClick, setUser }: RegistroProps) {
           <div className="w-full max-w-md">
             <div className="space-y-1 mb-4">
               <h2 className="text-2xl font-bold">Crear cuenta</h2>
-              <p className="text-gray-500">
-                Ingresa tus datos para registrarte
-              </p>
+              <p className="text-gray-500">Ingresa tus datos para registrarte</p>
             </div>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="space-y-2">
@@ -88,7 +105,7 @@ export default function Registro({ onLoginClick, setUser }: RegistroProps) {
                   disabled={isLoading}
                 />
               </div>
-              
+
               <div className="space-y-2">
                 <label htmlFor="email" className="block text-sm font-medium">
                   Correo electrónico
@@ -148,14 +165,46 @@ export default function Registro({ onLoginClick, setUser }: RegistroProps) {
                 </div>
               </div>
 
-              {error && (
-                <div className="text-sm text-red-500">
-                  {error}
-                </div>
-              )}
+              <div className="space-y-2">
+                <label htmlFor="securityQuestion" className="block text-sm font-medium">
+                  Pregunta de seguridad
+                </label>
+                <select
+                  id="securityQuestion"
+                  name="securityQuestion"
+                  className="w-full rounded-md p-2 border-2 border-Brown-fist outline-none focus:border-Brown-third"
+                  value={formData.securityQuestion}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                >
+                  {SECURITY_QUESTIONS.map((question) => (
+                    <option key={question} value={question}>
+                      {question}
+                    </option>
+                  ))}
+                </select>
+              </div>
 
-              <button 
-                type="submit" 
+              <div className="space-y-2">
+                <label htmlFor="securityAnswer" className="block text-sm font-medium">
+                  Respuesta de seguridad
+                </label>
+                <input
+                  id="securityAnswer"
+                  name="securityAnswer"
+                  type="text"
+                  className="w-full rounded-md p-2 border-2 border-Brown-fist outline-none focus:border-Brown-third"
+                  required
+                  value={formData.securityAnswer}
+                  onChange={handleChange}
+                  disabled={isLoading}
+                />
+              </div>
+
+              {error && <div className="text-sm text-red-500">{error}</div>}
+
+              <button
+                type="submit"
                 className="w-full bg-Brown-fist text-white rounded-md py-2 font-semibold hover:bg-Brown-sec transition-colors disabled:opacity-50"
                 disabled={isLoading}
               >
@@ -164,11 +213,7 @@ export default function Registro({ onLoginClick, setUser }: RegistroProps) {
 
               <p className="text-sm mt-4">
                 ¿Ya tienes una cuenta?{" "}
-                <button
-                  type="button"
-                  onClick={onLoginClick}
-                  className="text-amber-800 hover:underline"
-                >
+                <button type="button" onClick={onLoginClick} className="text-amber-800 hover:underline">
                   Iniciar sesión
                 </button>
               </p>
@@ -176,9 +221,10 @@ export default function Registro({ onLoginClick, setUser }: RegistroProps) {
           </div>
         </div>
 
-        {/* Imagen (oculta en pantallas pequeñas) */}
-        <div className="hidden md:block md:w-1/2 bg-cover bg-center" style={{ backgroundImage: "url('src/images/Login1.jpg')" }}>
-        </div>
+        <div
+          className="hidden md:block md:w-1/2 bg-cover bg-center"
+          style={{ backgroundImage: "url('src/images/Login1.jpg')" }}
+        ></div>
       </div>
     </section>
   )
